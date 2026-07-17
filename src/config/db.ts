@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 
+console.log("=== DATABASE ENV ===");
 console.log({
   DB_HOST: process.env.DB_HOST,
   DB_PORT: process.env.DB_PORT,
@@ -7,13 +8,14 @@ console.log({
   DB_USER: process.env.DB_USER,
   DB_PASSWORD: process.env.DB_PASSWORD ? "SET" : "NOT SET",
 });
+console.log("====================");
 
 const pool = new Pool({
-  host: process.env.DB_HOST || "localhost",
-  port: parseInt(process.env.DB_PORT || "5432", 10),
-  database: process.env.DB_NAME || "hris_db",
-  user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "123",
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
 });
 
 export default pool;
