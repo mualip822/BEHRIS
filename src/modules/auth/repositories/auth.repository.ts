@@ -1,5 +1,6 @@
 import db from "../../../config/db";
 
+
 // ==============================
 // FIND USER BY EMAIL
 // ==============================
@@ -21,8 +22,9 @@ export const findUserByEmail = async (
 
 };
 
+
 // ==============================
-// FIND USER BY ID
+// FIND USER BY UUID
 // ==============================
 export const findUserByUuid = async (
   uuid: string
@@ -41,6 +43,8 @@ export const findUserByUuid = async (
   return result.rows[0];
 
 };
+
+
 // ==============================
 // CREATE USER
 // ==============================
@@ -54,6 +58,7 @@ export const createUser = async (
     password,
     role_id,
   } = data;
+
 
   const result = await db.query(
     `
@@ -72,11 +77,11 @@ export const createUser = async (
         $4
       )
       RETURNING
-id,
-uuid,
-name,
-email,
-role_id
+        id,
+        uuid,
+        name,
+        email,
+        role_id
     `,
     [
       name,
@@ -86,9 +91,12 @@ role_id
     ]
   );
 
+
   return result.rows[0];
 
 };
+
+
 
 // ==============================
 // CREATE GOOGLE USER
@@ -102,11 +110,13 @@ export const createGoogleUser = async (
   }
 ) => {
 
+
   const {
     name,
     email,
     role_id,
   } = data;
+
 
   const result = await db.query(
     `
@@ -128,6 +138,7 @@ export const createGoogleUser = async (
       )
       RETURNING
         id,
+        uuid,
         name,
         email,
         role_id
@@ -141,9 +152,12 @@ export const createGoogleUser = async (
     ]
   );
 
+
   return result.rows[0];
 
 };
+
+
 
 // ==============================
 // SAVE 2FA SECRET
@@ -152,6 +166,7 @@ export const save2FASecret = async (
   userUuid: string,
   secret: string
 ) => {
+
 
   await db.query(
     `
@@ -166,6 +181,9 @@ export const save2FASecret = async (
   );
 
 };
+
+
+
 // ==============================
 // ENABLE 2FA
 // ==============================
@@ -173,14 +191,43 @@ export const enable2FA = async (
   userUuid: string
 ) => {
 
+
   await db.query(
     `
       UPDATE users
       SET two_factor_enabled = true
       WHERE uuid = $1
     `,
-    [userUuid]
+    [
+      userUuid
+    ]
   );
 
 };
 
+
+
+// ==============================
+// FIND ROLE BY NAME
+// ==============================
+export const findRoleByName = async (
+  name: string
+) => {
+
+
+  const result = await db.query(
+    `
+      SELECT id, name
+      FROM roles
+      WHERE name = $1
+      LIMIT 1
+    `,
+    [
+      name
+    ]
+  );
+
+
+  return result.rows[0];
+
+};
