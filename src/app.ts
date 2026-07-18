@@ -20,23 +20,114 @@ import { ROLES } from "./core/constants/roles";
 
 const app = express();
 
+
+// ===================================
+// DEBUG REQUEST
+// ===================================
+
+app.use((req, _res, next) => {
+  console.log(
+    "REQUEST:",
+    req.method,
+    req.originalUrl,
+    "ORIGIN:",
+    req.headers.origin
+  );
+
+  next();
+});
+
+
 // ===================================
 // CORS
 // ===================================
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "https://kariryadin.netlify.app",
+];
+
+
+const corsOptions = {
+  origin: function (
+    origin: any,
+    callback: any
+  ) {
+
+    console.log(
+      "CORS CHECK ORIGIN:",
+      origin
+    );
+
+
+    // allow request tanpa origin
+    if (!origin) {
+      return callback(null, true);
+    }
+
+
+    if (
+      allowedOrigins.includes(origin)
+    ) {
+      console.log(
+        "CORS ALLOWED:",
+        origin
+      );
+
+      return callback(null, true);
+    }
+
+
+    console.log(
+      "CORS BLOCKED:",
+      origin
+    );
+
+    return callback(null, false);
+  },
+
+
+  credentials: true,
+
+
+  methods: [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+  ],
+
+
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+  ],
+};
+
+
 app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      process.env.FRONTEND_URL || "",
-    ],
-    credentials: true,
-  })
+  cors(corsOptions)
 );
+
+
+// preflight
+app.options(
+  "*",
+  cors(corsOptions)
+);
+
 
 // ===================================
 // BODY PARSER
 // ===================================
-app.use(express.json());
+
+app.use(
+  express.json()
+);
+
 
 app.use(
   express.urlencoded({
@@ -44,128 +135,173 @@ app.use(
   })
 );
 
+
 // ===================================
 // STATIC FILE
 // ===================================
+
 app.use(
   "/uploads",
   express.static(
-    path.join(process.cwd(), "uploads")
+    path.join(
+      process.cwd(),
+      "uploads"
+    )
   )
 );
+
 
 // ===================================
 // ROOT
 // ===================================
-app.get("/", (_req, res) => {
-  res.json({
-    success: true,
-    service: "BEHRIS API",
-    status: "Running",
-    database: "Connected",
-    version: "1.0.0",
-  });
-});
+
+app.get(
+  "/",
+  (_req, res) => {
+
+    res.json({
+      success: true,
+      service: "BEHRIS API",
+      status: "Running",
+      database: "Connected",
+      version: "1.0.0",
+    });
+
+  }
+);
+
 
 // ===================================
-// AUTH
+// ROUTES
 // ===================================
-app.use("/api/auth", authRoutes);
 
-// ===================================
-// REKRUTMEN
-// ===================================
-app.use("/api/rekrutmen", rekrutmenRoutes);
+app.use(
+  "/api/auth",
+  authRoutes
+);
 
-// ===================================
-// PROFILE
-// ===================================
-app.use("/api/profile", profileRoutes);
 
-// ===================================
-// APPLY
-// ===================================
-app.use("/api/apply", applyRoutes);
+app.use(
+  "/api/rekrutmen",
+  rekrutmenRoutes
+);
 
-// ===================================
-// CANDIDATE
-// ===================================
+
+app.use(
+  "/api/profile",
+  profileRoutes
+);
+
+
+app.use(
+  "/api/apply",
+  applyRoutes
+);
+
+
 app.use(
   "/api/rekrutmen/candidates",
   candidateRoutes
 );
 
-// ===================================
-// MESSAGE
-// ===================================
+
 app.use(
   "/api/rekrutmen/messages",
   userMessageRoutes
 );
 
-// ===================================
-// TEST ADMIN
-// ===================================
-app.use("/api/tests", testRoutes);
 
-// ===================================
-// CANDIDATE TEST
-// ===================================
-app.use("/api/candidate", candidateTestRoutes);
+app.use(
+  "/api/tests",
+  testRoutes
+);
+
+
+app.use(
+  "/api/candidate",
+  candidateTestRoutes
+);
+
 
 // ===================================
 // TEST AUTH
 // ===================================
+
 app.get(
   "/api/test",
   authMiddleware,
   (req: any, res) => {
+
     res.json({
       success: true,
-      message: "Protected route success",
+      message:
+        "Protected route success",
       user: req.user,
     });
+
   }
 );
+
 
 // ===================================
 // ADMIN
 // ===================================
+
 app.get(
   "/api/admin",
   authMiddleware,
-  roleMiddleware([ROLES.ADMIN]),
+  roleMiddleware([
+    ROLES.ADMIN
+  ]),
   (_req, res) => {
+
     res.json({
       success: true,
       message: "Admin only",
     });
+
   }
 );
+
 
 // ===================================
 // HR
 // ===================================
+
 app.get(
   "/api/hr",
   authMiddleware,
-  roleMiddleware([ROLES.REKRUTMEN_ADMIN]),
+  roleMiddleware([
+    ROLES.REKRUTMEN_ADMIN
+  ]),
   (_req, res) => {
+
     res.json({
       success: true,
-      message: "Rekrutmen Admin only",
+      message:
+        "Rekrutmen Admin only",
     });
+
   }
 );
+
 
 // ===================================
 // 404
 // ===================================
-app.use("*", (_req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route tidak ditemukan",
-  });
-});
+
+app.use(
+  "*",
+  (_req, res) => {
+
+    res.status(404).json({
+      success: false,
+      message:
+        "Route tidak ditemukan",
+    });
+
+  }
+);
+
 
 export default app;
