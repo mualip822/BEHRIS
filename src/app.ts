@@ -20,11 +20,22 @@ import { ROLES } from "./core/constants/roles";
 
 const app = express();
 
-// ===============================
-// GLOBAL MIDDLEWARE
-// ===============================
-app.use(cors());
+// ===================================
+// CORS
+// ===================================
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      process.env.FRONTEND_URL || "",
+    ],
+    credentials: true,
+  })
+);
 
+// ===================================
+// BODY PARSER
+// ===================================
 app.use(express.json());
 
 app.use(
@@ -33,91 +44,93 @@ app.use(
   })
 );
 
-// ===============================
-// STATIC FILES
-// ===============================
+// ===================================
+// STATIC FILE
+// ===================================
 app.use(
   "/uploads",
   express.static(
-    path.join(
-      process.cwd(),
-      "uploads"
-    )
+    path.join(process.cwd(), "uploads")
   )
 );
 
-// ===============================
-// ROUTES
-// ===============================
+// ===================================
+// ROOT
+// ===================================
+app.get("/", (_req, res) => {
+  res.json({
+    success: true,
+    service: "BEHRIS API",
+    status: "Running",
+    database: "Connected",
+    version: "1.0.0",
+  });
+});
 
+// ===================================
 // AUTH
-app.use(
-  "/api/auth",
-  authRoutes
-);
+// ===================================
+app.use("/api/auth", authRoutes);
 
+// ===================================
 // REKRUTMEN
-app.use(
-  "/api/rekrutmen",
-  rekrutmenRoutes
-);
+// ===================================
+app.use("/api/rekrutmen", rekrutmenRoutes);
 
+// ===================================
 // PROFILE
-app.use(
-  "/api/profile",
-  profileRoutes
-);
+// ===================================
+app.use("/api/profile", profileRoutes);
 
+// ===================================
 // APPLY
-app.use(
-  "/api/apply",
-  applyRoutes
-);
+// ===================================
+app.use("/api/apply", applyRoutes);
 
-// CANDIDATE REKRUTMEN
+// ===================================
+// CANDIDATE
+// ===================================
 app.use(
   "/api/rekrutmen/candidates",
   candidateRoutes
 );
 
-// USER MESSAGE
+// ===================================
+// MESSAGE
+// ===================================
 app.use(
   "/api/rekrutmen/messages",
   userMessageRoutes
 );
 
+// ===================================
 // TEST ADMIN
-app.use(
-  "/api/tests",
-  testRoutes
-);
+// ===================================
+app.use("/api/tests", testRoutes);
 
-// ===============================
+// ===================================
 // CANDIDATE TEST
-// ===============================
-app.use(
-  "/api/candidate",
-  candidateTestRoutes
-);
+// ===================================
+app.use("/api/candidate", candidateTestRoutes);
 
-// ===============================
+// ===================================
 // TEST AUTH
-// ===============================
+// ===================================
 app.get(
   "/api/test",
   authMiddleware,
   (req: any, res) => {
     res.json({
       success: true,
-      message: "Protected route success 🔥",
+      message: "Protected route success",
       user: req.user,
     });
   }
 );
 
-// ===============================
-// ADMIN ONLY
-// ===============================
+// ===================================
+// ADMIN
+// ===================================
 app.get(
   "/api/admin",
   authMiddleware,
@@ -125,14 +138,14 @@ app.get(
   (_req, res) => {
     res.json({
       success: true,
-      message: "Admin only 🔥",
+      message: "Admin only",
     });
   }
 );
 
-// ===============================
-// REKRUTMEN ADMIN ONLY
-// ===============================
+// ===================================
+// HR
+// ===================================
 app.get(
   "/api/hr",
   authMiddleware,
@@ -140,14 +153,14 @@ app.get(
   (_req, res) => {
     res.json({
       success: true,
-      message: "Rekrutmen Admin only 🔥",
+      message: "Rekrutmen Admin only",
     });
   }
 );
 
-// ===============================
-// NOT FOUND HANDLER
-// ===============================
+// ===================================
+// 404
+// ===================================
 app.use("*", (_req, res) => {
   res.status(404).json({
     success: false,

@@ -4,43 +4,27 @@ import app from "./app";
 import db from "./config/db";
 
 // =====================================
-// CHECK GOOGLE CLIENT ID
+// GOOGLE CLIENT ID
 // =====================================
-console.log(
-  process.env
-    .GOOGLE_CLIENT_ID
-);
-
-const PORT =
-  process.env.PORT || 3000;
+console.log("GOOGLE CLIENT ID:");
+console.log(process.env.GOOGLE_CLIENT_ID);
 
 // =====================================
-// DATABASE CONNECT
+// PORT
+// =====================================
+const PORT = Number(process.env.PORT) || 3000;
+
+// =====================================
+// DATABASE
 // =====================================
 db.connect()
   .then(() => {
+    console.log("Database connected ✅");
 
-    console.log(
-      "Database connected ✅"
-    );
-
-    // =================================
-    // START SERVER
-    // =================================
-    app.listen(PORT, () => {
-
-      console.log(
-        `Server running on http://localhost:${PORT}`
-      );
-
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on port ${PORT}`);
     });
-
   })
   .catch((err) => {
-
-    console.error(
-      "DB Error ❌",
-      err
-    );
-
+    console.error("DB Error ❌", err);
   });

@@ -23,13 +23,11 @@ import {
 // ======================================
 const ROLE = {
 
-  HRIS_ADMIN: 1,
+  ADMIN: 1,
 
-  REKRUTMEN_ADMIN: 2,
+  HR: 2,
 
-  ABSENSI_ADMIN: 3,
-
-  EMPLOYEE: 4,
+  USER: 3,
 
 };
 
@@ -42,17 +40,14 @@ const mapRole = (
 
   switch (role_id) {
 
-    case ROLE.HRIS_ADMIN:
+    case ROLE.ADMIN:
       return "admin";
 
-    case ROLE.REKRUTMEN_ADMIN:
-      return "rekrutmen_admin";
+    case ROLE.HR:
+      return "hr";
 
-    case ROLE.ABSENSI_ADMIN:
-      return "absensi_admin";
-
-    case ROLE.EMPLOYEE:
-      return "employee";
+    case ROLE.USER:
+      return "user";
 
     default:
       return "guest";
@@ -252,7 +247,7 @@ export const loginWithGoogle =
             googlePayload.picture,
 
           role_id:
-            ROLE.EMPLOYEE,
+  ROLE.USER,
 
         });
 
